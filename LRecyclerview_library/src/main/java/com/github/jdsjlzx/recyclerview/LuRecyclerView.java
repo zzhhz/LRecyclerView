@@ -20,14 +20,14 @@ import com.github.jdsjlzx.interfaces.OnNetWorkErrorListener;
 import com.github.jdsjlzx.view.LoadingFooter;
 
 /**
- *
  * @author Lzx
  * @created 2016/9/9 16:45
- *
  */
 public class LuRecyclerView extends RecyclerView {
     private boolean mLoadMoreEnabled = true;
-    /** 是否手动点击加载更多 */
+    /**
+     * 是否手动点击加载更多
+     */
     private boolean mIsManualLoadMore = false;
     private boolean mRefreshing = false;//是否正在下拉刷新
     private boolean mLoadingData = false;//是否正在加载数据
@@ -109,7 +109,7 @@ public class LuRecyclerView extends RecyclerView {
 
     private void init() {
         if (mLoadMoreEnabled) {
-            setLoadMoreFooter(new LoadingFooter(getContext().getApplicationContext()),false);
+            setLoadMoreFooter(new LoadingFooter(getContext().getApplicationContext()), false);
         }
     }
 
@@ -119,14 +119,19 @@ public class LuRecyclerView extends RecyclerView {
             mWrapAdapter.getInnerAdapter().unregisterAdapterDataObserver(mDataObserver);
         }
 
-        mWrapAdapter = (LuRecyclerViewAdapter) adapter;
-        super.setAdapter(mWrapAdapter);
+        if (adapter instanceof LRecyclerViewAdapter) {
 
-        mWrapAdapter.getInnerAdapter().registerAdapterDataObserver(mDataObserver);
-        mDataObserver.onChanged();
+            mWrapAdapter = (LuRecyclerViewAdapter) adapter;
+            super.setAdapter(mWrapAdapter);
 
-        if (mLoadMoreEnabled && mWrapAdapter.getFooterViewsCount()==0) {
-            mWrapAdapter.addFooterView(mFootView);
+            mWrapAdapter.getInnerAdapter().registerAdapterDataObserver(mDataObserver);
+            mDataObserver.onChanged();
+
+            if (mLoadMoreEnabled && mWrapAdapter.getFooterViewsCount() == 0) {
+                mWrapAdapter.addFooterView(mFootView);
+            }
+        } else {
+            super.setAdapter(adapter);
         }
 
     }
@@ -161,7 +166,7 @@ public class LuRecyclerView extends RecyclerView {
 
             if (mWrapAdapter != null) {
                 mWrapAdapter.notifyDataSetChanged();
-                if(mWrapAdapter.getInnerAdapter().getItemCount() < mPageSize ) {
+                if (mWrapAdapter.getInnerAdapter().getItemCount() < mPageSize) {
                     mFootView.setVisibility(GONE);
                 }
             }
@@ -181,7 +186,7 @@ public class LuRecyclerView extends RecyclerView {
         @Override
         public void onItemRangeRemoved(int positionStart, int itemCount) {
             mWrapAdapter.notifyItemRangeRemoved(positionStart + mWrapAdapter.getHeaderViewsCount(), itemCount);
-            if(mWrapAdapter.getInnerAdapter().getItemCount() < mPageSize ) {
+            if (mWrapAdapter.getInnerAdapter().getItemCount() < mPageSize) {
                 mFootView.setVisibility(GONE);
             }
 
@@ -224,12 +229,12 @@ public class LuRecyclerView extends RecyclerView {
      * @param pageSize 一页加载的数量
      */
     public void refreshComplete(int pageSize) {
-        Log.e("lzx","refreshComplete  pageSize " + pageSize );
+        Log.e("lzx", "refreshComplete  pageSize " + pageSize);
         this.mPageSize = pageSize;
         if (mRefreshing) {
             isNoMore = false;
             mRefreshing = false;
-            if(mWrapAdapter.getInnerAdapter().getItemCount() < pageSize) {
+            if (mWrapAdapter.getInnerAdapter().getItemCount() < pageSize) {
                 mFootView.setVisibility(GONE);
             }
         } else if (mLoadingData) {
@@ -246,14 +251,14 @@ public class LuRecyclerView extends RecyclerView {
 
     /**
      * @param pageSize 一页加载的数量
-     * @param total 总数
+     * @param total    总数
      */
     public void refreshComplete(int pageSize, int total) {
         this.mPageSize = pageSize;
         if (mRefreshing) {
             isNoMore = false;
             mRefreshing = false;
-            if(mWrapAdapter.getInnerAdapter().getItemCount() < pageSize) {
+            if (mWrapAdapter.getInnerAdapter().getItemCount() < pageSize) {
                 mFootView.setVisibility(GONE);
             }
         } else if (mLoadingData) {
@@ -274,8 +279,9 @@ public class LuRecyclerView extends RecyclerView {
     /**
      * 此方法主要是为了满足数据不满一屏幕或者数据小于pageSize的情况下，是否显示footview
      * 在分页情况下使用refreshComplete(int pageSize, int total, boolean false)就相当于refreshComplete(int pageSize, int total)
-     * @param pageSize 一页加载的数量
-     * @param total 总数
+     *
+     * @param pageSize       一页加载的数量
+     * @param total          总数
      * @param isShowFootView 是否需要显示footview（前提条件是：getItemCount() < pageSize）
      */
     public void refreshComplete(int pageSize, int total, boolean isShowFootView) {
@@ -286,7 +292,7 @@ public class LuRecyclerView extends RecyclerView {
             if (isShowFootView) {
                 mFootView.setVisibility(VISIBLE);
             } else {
-                if(mWrapAdapter.getInnerAdapter().getItemCount() < pageSize) {
+                if (mWrapAdapter.getInnerAdapter().getItemCount() < pageSize) {
                     mFootView.setVisibility(GONE);
                     mWrapAdapter.removeFooterView();
                 } else {
@@ -312,15 +318,16 @@ public class LuRecyclerView extends RecyclerView {
 
     /**
      * 设置是否已加载全部
+     *
      * @param noMore
      */
-    public void setNoMore(boolean noMore){
+    public void setNoMore(boolean noMore) {
         mLoadingData = false;
         isNoMore = noMore;
-        if(isNoMore) {
+        if (isNoMore) {
             mFootView.setVisibility(VISIBLE);
             mLoadMoreFooter.onNoMore();
-            Log.e("lzx","setNoMore true ");
+            Log.e("lzx", "setNoMore true ");
         } else {
             mLoadMoreFooter.onComplete();
         }
@@ -328,13 +335,14 @@ public class LuRecyclerView extends RecyclerView {
 
     /**
      * 设置是否已加载全部
+     *
      * @param noMore
      * @param isShowFootView
      */
-    public void setNoMore(boolean noMore, boolean isShowFootView){
+    public void setNoMore(boolean noMore, boolean isShowFootView) {
         mLoadingData = false;
         isNoMore = noMore;
-        if(isNoMore) {
+        if (isNoMore) {
             if (isShowFootView) {
                 mFootView.setVisibility(VISIBLE);
             } else {
@@ -342,7 +350,7 @@ public class LuRecyclerView extends RecyclerView {
                 mWrapAdapter.removeFooterView();
             }
             mLoadMoreFooter.onNoMore();
-            Log.e("lzx","setNoMore true ");
+            Log.e("lzx", "setNoMore true ");
         } else {
             mLoadMoreFooter.onComplete();
         }
@@ -350,13 +358,14 @@ public class LuRecyclerView extends RecyclerView {
 
     /**
      * 设置自定义的footerview
+     *
      * @param loadMoreFooter
-     * @param isCustom 是否自定义footview
+     * @param isCustom       是否自定义footview
      */
     public void setLoadMoreFooter(ILoadMoreFooter loadMoreFooter, boolean isCustom) {
         this.mLoadMoreFooter = loadMoreFooter;
         if (isCustom) {
-            if (null != mWrapAdapter && mWrapAdapter.getFooterViewsCount() >0) {
+            if (null != mWrapAdapter && mWrapAdapter.getFooterViewsCount() > 0) {
                 mWrapAdapter.removeFooterView();
             }
         }
@@ -372,7 +381,7 @@ public class LuRecyclerView extends RecyclerView {
         }
 
         if (isCustom) {
-            if (mLoadMoreEnabled && mWrapAdapter.getFooterViewsCount()==0) {
+            if (mLoadMoreEnabled && mWrapAdapter.getFooterViewsCount() == 0) {
                 mWrapAdapter.addFooterView(mFootView);
             }
         }
@@ -383,7 +392,7 @@ public class LuRecyclerView extends RecyclerView {
      * 到底加载是否可用
      */
     public void setLoadMoreEnabled(boolean enabled) {
-        if(mWrapAdapter == null){
+        if (mWrapAdapter == null) {
             throw new NullPointerException("mWrapAdapter cannot be null, please make sure the variable mWrapAdapter have been initialized.");
         }
         mLoadMoreEnabled = enabled;
@@ -396,7 +405,7 @@ public class LuRecyclerView extends RecyclerView {
      * 滑动到底手动点击加载
      */
     public void setManualLoadMore(boolean enabled) {
-        if(mWrapAdapter == null){
+        if (mWrapAdapter == null) {
             throw new NullPointerException("mWrapAdapter cannot be null, please make sure the variable mWrapAdapter have been initialized.");
         }
         mIsManualLoadMore = enabled;
@@ -429,6 +438,7 @@ public class LuRecyclerView extends RecyclerView {
 
     /**
      * 设置Footer文字颜色
+     *
      * @param indicatorColor
      * @param hintColor
      * @param backgroundColor
@@ -436,7 +446,7 @@ public class LuRecyclerView extends RecyclerView {
     public void setFooterViewColor(int indicatorColor, int hintColor, int backgroundColor) {
         if (mLoadMoreFooter instanceof LoadingFooter) {
             LoadingFooter loadingFooter = ((LoadingFooter) mLoadMoreFooter);
-            loadingFooter.setIndicatorColor(ContextCompat.getColor(getContext(),indicatorColor));
+            loadingFooter.setIndicatorColor(ContextCompat.getColor(getContext(), indicatorColor));
             loadingFooter.setHintTextColor(hintColor);
             loadingFooter.setViewBackgroundColor(backgroundColor);
         }
@@ -521,7 +531,7 @@ public class LuRecyclerView extends RecyclerView {
         //如果想要滑动到底部自动加载更多，mIsManualLoadMore必须为false
         if (mIsManualLoadMore) {
             if (!isNoMore) {
-                Log.e("lzx","onScrooo set visible");
+                Log.e("lzx", "onScrooo set visible");
                 mLoadingData = true;
                 mLoadMoreFooter.setOnClickLoadMoreListener(mLoadMoreListener);
             }
@@ -606,17 +616,17 @@ public class LuRecyclerView extends RecyclerView {
             }
             p = p.getParent();
         }
-        if(p instanceof CoordinatorLayout) {
-            CoordinatorLayout coordinatorLayout = (CoordinatorLayout)p;
+        if (p instanceof CoordinatorLayout) {
+            CoordinatorLayout coordinatorLayout = (CoordinatorLayout) p;
             final int childCount = coordinatorLayout.getChildCount();
             for (int i = childCount - 1; i >= 0; i--) {
                 final View child = coordinatorLayout.getChildAt(i);
-                if(child instanceof AppBarLayout) {
-                    appBarLayout = (AppBarLayout)child;
+                if (child instanceof AppBarLayout) {
+                    appBarLayout = (AppBarLayout) child;
                     break;
                 }
             }
-            if(appBarLayout != null) {
+            if (appBarLayout != null) {
                 appBarLayout.addOnOffsetChangedListener(new AppBarStateChangeListener() {
                     @Override
                     public void onStateChanged(AppBarLayout appBarLayout, State state) {
