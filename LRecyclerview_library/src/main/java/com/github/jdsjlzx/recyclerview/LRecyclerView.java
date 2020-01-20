@@ -134,6 +134,7 @@ public class LRecyclerView extends RecyclerView {
     public void setAdapter(Adapter adapter) {
         if (mWrapAdapter != null && mDataObserver != null && isRegisterDataObserver) {
             mWrapAdapter.getInnerAdapter().unregisterAdapterDataObserver(mDataObserver);
+            isRegisterDataObserver = false;
         }
 
         if (adapter instanceof LRecyclerViewAdapter) {
